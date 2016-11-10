@@ -1,7 +1,68 @@
-//
-   Created by qlba on 27.10.2016.
+// Created by qlba on 27.10.2016.
 
 extends ./head
 
+mixin articleSection(sectId, sectName, sectContent)
+    section.ArticleBodyBlock(id= "" + sectId)
+        h1= sectName
+        hr
+        != mkdn(sectContent)
+
+mixin rightTableRow(k, v)
+    tr
+        td.RightTableCell= k
+        td.RightTableCell= v
+
+
 block content
-    h1 WIKIENGINE
+
+    include ../generic/header
+
+    if (!error)
+
+        nav.Container#leftNavPanel
+            a(href="/wiki/article").LeftPanelNavLink Main page
+            a(href="/wiki/article").LeftPanelNavLink Random article
+            hr
+            each val in article.links
+                a.LeftPanelNavLink(href=val.url)= val.label
+
+        section.Container#articleBox
+            header.Container#articleHead
+                h1= article.name
+                hr
+                section.Container#articleHeadContent
+                    section.Container#articleHeadLeft
+                        section.Container#articleBriefBox
+                            p= article.left.articleBrief
+
+                        section.Container#articleContentsListBox
+                            section#articleContentsList
+                                p(align="center") Contents
+                                table
+                                    tbody
+                                        each val in article.content
+                                            tr
+                                                td.ContentsListSectionId
+                                                    a(href="#" + val.sectId)= val.sectId + 1
+                                                td.ContentsListSectionName
+                                                    a(href="#" + val.sectId)= val.sectName
+
+                    section.Container#articleHeadRight
+                        h3(align="center")= article.right.category
+                        section.Container#articleRightTableBox
+                            p#imageParagraph(align="center")
+                                img#rightTableImage(src=article.right.imageUrl)
+                            table
+                                tbody
+                                    each val in article.right.tableContent
+                                        +rightTableRow(val.k, val.v)
+
+            section.Container#articleBody
+                each val in article.content
+                    +articleSection(val.sectId, val.sectName, val.sectContent)
+
+    else
+        h1= article.name
+
+    include ../generic/footer

@@ -1,0 +1,188 @@
+/* Global override of fonts */
+* {
+    box-sizing: border-box;
+    /*border: 1px solid black;*/
+    font-family: sans-serif;
+    /*margin: 0px;*/
+}
+
+
+.Container {
+    /*margin: 8px;*/
+    /*border: 1px solid #6188bb;*/
+    /*border-radius: 10px;*/
+}
+
+.ArticleBodyBlock {
+    /*border: 1px solid #ff0000;*/
+    /*border-radius: 5px;*/
+    padding-top: 20px;
+}
+
+.LogoSpec {
+    padding: 4px;
+    border-radius: 5px;
+    background: #000000;
+    color: #00ff00;
+}
+
+
+#pageHeader {
+    display: flex;
+    justify-content: space-between;
+
+    border-bottom: solid black 1px;
+    /*border-top: hidden;*/
+    border-radius: 10px;
+}
+
+#pageHeader header, div {
+    vertical-align: middle;
+}
+
+#mainLogoHeader p {
+    font-family: Arial, sans-serif;
+    font-size: 300%;
+    text-align: left;
+    margin: 10px;
+}
+
+.ActionBox {
+    margin: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ActionBox form * {
+    margin: 10px;
+    display: inline-block;
+}
+
+
+
+#leftNavPanel {
+    float: left;
+    width: 15%;
+
+    padding: 20px 10px 10px;
+}
+
+.LeftPanelNavLink {
+    display: block;
+}
+
+
+#articleBox {
+    float: right;
+    width: 85%;
+}
+
+
+#mainFooter {
+    clear: both;
+
+    padding-top: 20px;
+}
+
+
+
+#articleBox {
+    padding-left: 15px;
+
+    border-left: solid black 1px;
+    border-bottom: solid black 1px;
+    /*border-top: hidden;*/
+    border-radius: 10px;
+}
+
+#articleHead {
+}
+
+#articleHeadContent {
+    display: flex;
+}
+
+#articleHeadLeft {
+    float: left;
+    /*max-width: 70%;*/
+    margin-bottom: 30px;
+
+    flex-shrink: 1;
+}
+
+#articleBriefBox {
+
+}
+
+#articleContentsListBox {
+
+}
+
+#articleContentsList {
+    border: 1px solid #00B7FF;
+    border-radius: 10px;
+
+    background: #DFF7FF;
+    display: inline-block;
+}
+
+.ContentsListSectionId, .ContentsListSectionName {
+    padding-left: 10px;
+    text-underline: none;
+}
+
+.ContentsListSectionName {
+    padding-right: 10px;
+}
+
+#articleHeadRight {
+    float: right;
+
+    border: solid black 1px;
+    border-top: hidden;
+    border-right: hidden;
+    border-radius: 10px;
+
+    /*flex-basis: 30%;*/
+    flex-shrink: 0;
+
+    padding: 10px;
+}
+
+#articleHeadRight h3 {
+
+    /*margin: 10px;*/
+    /*wrap: off;*/
+}
+
+#articleRightTableBox {
+
+}
+
+#imageParagraph {
+}
+
+#rightTableImage {
+    width: 150px;
+}
+
+.RightTableCell {
+    padding: 8px;
+}
+
+.FooterLink {
+    padding: 10px;
+}
+
+
+#articleBody {
+    clear: both;
+}
+
+
+
+/*
+Special colors:
+6188bb -- wikipedia darkened
+00B7FF -- wikipedia
+*/
