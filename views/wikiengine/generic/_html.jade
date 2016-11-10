@@ -5,7 +5,8 @@ doctype html
 html(lang='ru')
     head
         meta(charset="utf-8")
-        block stylesheets
+        each style in head.styles
+            link(rel='stylesheet', href= style)
         title= head.title
     body
         block content
