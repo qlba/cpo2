@@ -1,0 +1,55 @@
+body {
+    box-sizing: border-box;
+    /*border: 1px solid black;*/
+    font-family: "Arial", sans-serif;
+    /*margin: 0px;*/
+}
+
+.LogoSpec {
+    padding: 4px;
+    border-radius: 5px;
+    background: #000000;
+    color: #00ff00;
+}
+
+#pageHeader {
+    display: flex;
+    justify-content: space-between;
+
+    border-bottom: solid black 1px;
+    /*border-top: hidden;*/
+    border-radius: 10px;
+}
+
+#pageHeader header, div {
+    vertical-align: middle;
+}
+
+#mainLogoHeader p {
+    font-family: Arial, sans-serif;
+    font-size: 300%;
+    text-align: left;
+    margin: 10px;
+}
+
+.ActionBox {
+    margin: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ActionBox form * {
+    margin: 10px;
+    display: inline-block;
+}
+
+
+#mainFooter {
+    clear: both;
+
+    padding-top: 20px;
+}
+
+.FooterLink {
+    padding: 10px;
+}
