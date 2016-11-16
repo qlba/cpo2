@@ -65,7 +65,7 @@ function respError(res, message)
     res.render('wikiengine/article/body', { error: message, login: 'qlba' });
 }
 
-function answerUsingDb(res, callback)
+function answerUsingDb(res, answerer)
 {
     require('mongodb').MongoClient.connect(
         'mongodb://127.0.0.1:27017/wikiengine',
@@ -74,24 +74,16 @@ function answerUsingDb(res, callback)
             if (err)
                 respError(res, 'Server error');
             else
-                answerer(null, res, db);
+                answerer(res, db);
         }
     );
 }
 
 
 
-// async
-// co
-// 2do2go/
-
-//  validator    jsonschema
 
 router.get('/wiki/article', function(req, res, next) {
-    db.connect()
-        .then()
-        .then()
-        .catch()
+
         answerUsingDb(res,
             function (res, db) {
                 if(req.query["article"] === undefined || req.query["article"] === '')
