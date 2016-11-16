@@ -1,0 +1,38 @@
+//
+   Created by qlba on 12.11.2016.
+
+extends ../../wikiengine/generic/_html
+
+block head_data_full
+    - var head = {};
+    - head.styles = ['/stylesheets/wikiengine/generic/headerfooter.css', '/stylesheets/wikiengine/article/main.css'];
+    - head.title = 'Markdown shell commit';
+
+block content
+    table
+        tr
+            td(style='border: solid 1px black')
+                h1(align='center') Preview
+            td(style='border: solid 1px black')
+                h1(align='center') HTML
+        tr
+            td.ArticleBodyBlock(style='border: solid 1px black; width: 49%')
+                != mkdn(markdown)
+            td.ArticleBodyBlock(style='border: solid 1px black; width: 49%')
+                = mkdn(markdown)
+
+
+        //| Print preview
+        //hr
+        //
+        //hr
+        //br
+        //br
+        //br
+        //hr
+        //hr
+        //| HTML
+        //hr
+        //
+        //hr
+        //

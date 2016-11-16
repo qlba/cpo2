@@ -2,18 +2,13 @@
    Created by qlba on 10.11.2016.
 
 doctype html
-html(lang='ru')
+html
+    //(lang='ru')
     head
-        meta(charset="utf-8")
+        //meta(charset="utf-8")
+        block head_data_full
         each style in head.styles
             link(rel='stylesheet', href= style)
         title= head.title
     body
         block content
-
-
-
-            // link(rel='stylesheet', href= head.style)
-            // '/stylesheets/wikiengine/article/main.css'
-
-            // article.name + ' - WIKIENGINE'

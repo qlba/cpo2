@@ -1,0 +1,49 @@
+//
+   Created by qlba on 10.11.2016.
+
+extends _html
+
+block head_data_full
+    block head_data
+    - head.styles.push('/stylesheets/wikiengine/generic/headerfooter.css');
+
+block content
+
+    header.Container#pageHeader
+        header.Container#mainLogoHeader
+            p
+                span.LogoSpec W
+                | IKI
+                span.LogoSpec E
+                | NGINE
+        div.Container
+            section.Container.ActionBox
+                if(login === undefined)
+                    form(action="/wiki/sys/login", method="get")
+                        p
+                            b Not
+                            | logged in
+                        input(type="hidden", name="return", value="/wiki/article?article=" + title)
+                        input(type="submit", value="Log in / Sign up")
+                else
+                    form(action="/wiki/sys/login", method="get")
+                        p Logged in as
+                            b= login
+                        input(type="hidden", name="return", value="/wiki/article?article=" + title)
+                        input(type="submit", value="Log out")
+            | |
+            section.Container.ActionBox
+                form(action="/wiki/article", method="get")
+                    input(type="search", name="article", autocomplete="on",
+                    placeholder="Search article...")
+                    input(type="submit", value="Search")
+
+    block body
+
+    footer.Container#mainFooter
+        p(align="center")
+            a(href='/').FooterLink WikiEngine developers
+            | |
+            a(href='/').FooterLink Privacy policy
+            | |
+            a(href='/').FooterLink About WikiEngine
