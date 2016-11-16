@@ -1,9 +1,27 @@
 /* Global override of fonts */
-* {
+body {
     box-sizing: border-box;
     /*border: 1px solid black;*/
-    font-family: sans-serif;
+    font-family: "Arial", sans-serif;
     /*margin: 0px;*/
+}
+
+code {
+    font-family: "Courier New", monospace;
+    background-color: #dfdfdf;
+    color: black /*#00ff00*/ /*#00CD83*/;
+    border: solid 1px #bfbfbf;
+    border-radius: 3px;
+    padding: 0 3px 0 3px;
+}
+
+blockquote {
+    font-family: cursive;
+    background-color: gainsboro;
+    color: black /*#00ff00*/ /*#00CD83*/;
+    border: solid 1px gray;
+    border-radius: 5px;
+    padding: 5px;
 }
 
 
@@ -11,53 +29,23 @@
     /*margin: 8px;*/
     /*border: 1px solid #6188bb;*/
     /*border-radius: 10px;*/
+
 }
 
 .ArticleBodyBlock {
     /*border: 1px solid #ff0000;*/
     /*border-radius: 5px;*/
     padding-top: 20px;
+    font-family: "Trebuchet MS", sans-serif;
 }
 
-.LogoSpec {
-    padding: 4px;
-    border-radius: 5px;
-    background: #000000;
-    color: #00ff00;
+.ArticleBodyBlock, #articleHead {
+    font-family: "Trebuchet MS", sans-serif;
 }
 
-
-#pageHeader {
-    display: flex;
-    justify-content: space-between;
-
-    border-bottom: solid black 1px;
-    /*border-top: hidden;*/
-    border-radius: 10px;
+.ArticleBodyBlock h1 {
+    font-size: 150%;
 }
-
-#pageHeader header, div {
-    vertical-align: middle;
-}
-
-#mainLogoHeader p {
-    font-family: Arial, sans-serif;
-    font-size: 300%;
-    text-align: left;
-    margin: 10px;
-}
-
-.ActionBox {
-    margin: 10px;
-    display: inline-block;
-    vertical-align: middle;
-}
-
-.ActionBox form * {
-    margin: 10px;
-    display: inline-block;
-}
-
 
 
 #leftNavPanel {
@@ -65,26 +53,18 @@
     width: 15%;
 
     padding: 20px 10px 10px;
+    box-sizing: border-box;
 }
 
 .LeftPanelNavLink {
     display: block;
 }
 
-
 #articleBox {
     float: right;
     width: 85%;
+    box-sizing: border-box;
 }
-
-
-#mainFooter {
-    clear: both;
-
-    padding-top: 20px;
-}
-
-
 
 #articleBox {
     padding-left: 15px;
@@ -107,7 +87,9 @@
     /*max-width: 70%;*/
     margin-bottom: 30px;
 
-    flex-shrink: 1;
+    width: 70%
+
+    /*flex-shrink: 1;*/
 }
 
 #articleBriefBox {
@@ -124,6 +106,7 @@
 
     background: #DFF7FF;
     display: inline-block;
+    padding-bottom: 10px;
 }
 
 .ContentsListSectionId, .ContentsListSectionName {
@@ -144,9 +127,13 @@
     border-radius: 10px;
 
     /*flex-basis: 30%;*/
-    flex-shrink: 0;
+    /*flex-shrink: 0;*/
+    max-width: 30%;
+
+    width: 30%;
 
     padding: 10px;
+    margin-left: 20px;
 }
 
 #articleHeadRight h3 {
@@ -167,19 +154,13 @@
 }
 
 .RightTableCell {
-    padding: 8px;
+    font-size: 80%;
+    padding: 3px;
 }
-
-.FooterLink {
-    padding: 10px;
-}
-
 
 #articleBody {
     clear: both;
 }
-
-
 
 /*
 Special colors:
