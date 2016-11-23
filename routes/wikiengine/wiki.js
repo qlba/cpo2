@@ -4,158 +4,147 @@
 
 var router = require('express').Router();
 
-// Article content to Jade
-/*
-var article = {
-    name: 'Meat Beat Manifest',
-    left: {
-        articleBrief: 'Meat beat manifest is a convention of efficient assassination technology. Meat beat manifest ' +
-        'was declared in 2005 at the conference "Thug Life 2005" in Brooklyn, New York.'
-    },
-    right: {
-        category: 'Thug Life 2015',
-        imageUrl: '/m60.bmp',
-        tableContent: [
-            {
-                k: 'Year',
-                v: '2015'
-            },
-            {
-                k: 'Voices for',
-                v: '352'
-            },
-            {
-                k: 'Voices against',
-                v: '0'
-            }
-        ]
-    },
-    content: [
-        {
-            sectId: 0,
-            sectName: 'Deadbeef Industries GmbH',
-            sectContent: 'Usual participant'
-        },
-        {
-            sectId: 1,
-            sectName: 'Forcemeat, Inc.',
-            sectContent: 'Hardcore meaters'
-        },
-        {
-            sectId: 2,
-            sectName: 'Deadmeat & co.',
-            sectContent: 'Just choppers'
-        }
-    ],
-    links: [
-        {
-            label: 'Main page',
-            url: '/wiki/article?article=mb'
-        }
-    ]
-};
-*/
 
-
-
-
-
-function respError(res, message)
+function respSingleArticle(res, login, art_arr)
 {
-    res.render('wikiengine/article/body', { error: message, login: 'qlba' });
+    return new Promise(function(rsl, rej){
+        if (art_arr.length == 0)
+            rej(new Error('No such article'));
+        else if (art_arr.length > 1)
+            rej(new Error('Ambiguity'));
+        else
+            res.render('wikiengine/article/body',
+                {
+                    article: art_arr[0],
+                    login: login,
+                    mkdn: require('markdown').markdown.toHTML
+                }
+            );
+    });
 }
 
-function answerUsingDb(res, answerer)
+function respRandomArticle(res, login, art_arr)
 {
-    require('mongodb').MongoClient.connect(
-        'mongodb://127.0.0.1:27017/wikiengine',
-        function (err, db)
-        {
-            if (err)
-                respError(res, 'Server error');
-            else
-                answerer(res, db);
+    return new Promise(function (rsl, rej){
+        if (art_arr.length == 0)
+            rej(new Error('Nothing to choose from'));
+        else {
+            var al = art_arr.length;
+
+            res.render('wikiengine/article/body',
+                {
+                    article: art_arr[Math.floor(Math.random() * al) % al],
+                    login: login,
+                    mkdn: require('markdown').markdown.toHTML
+                }
+            );
         }
-    );
+    });
+}
+
+function respError(res, login, error)
+{
+    return new Promise(function(rsl, rej){
+        res.render(
+            'wikiengine/article/body',
+            {
+                error: error.message,
+                login: login
+            }
+        );
+    });
 }
 
 
-
-
-router.get('/wiki/article', function(req, res, next) {
-
-        answerUsingDb(res,
-            function (res, db) {
-                if(req.query["article"] === undefined || req.query["article"] === '')
-                    respError(res, 'Article not specified');
-                else
-                    db.collection('articles').find({name: req.query["article"]}).toArray(
-                        function (err, article) {
-
-                            if (err)
-                                respError(res, 'Server error');
-                            else if (article.length == 0)
-                                respError(res, 'No such article');
-                            else if (article.length > 1)
-                                respError(res, 'Ambiguity');
-                            else
-                                res.render('wikiengine/article/body',
-                                    {
-                                        article: article[0],
-                                        login: undefined,
-                                        mkdn: require('markdown').markdown.toHTML
-                                    }
-                                );
-
-                            db.close();
-                        }
-                    );
-            }
-        );
-    }
-);
-
-router.get('/wiki/article-random', function(req, res, next) {
-
-        answerUsingDb(res,
-            function (res, db) {
-                db.collection('articles').find().toArray(
-                    function (err, article) {
-                        if (err)
-                            respError(res, 'Server error');
-                        else if (article.length == 0)
-                            respError(res, 'Nothing to choose from');
-                        else {
-                            var al = article.length;
-
-                            res.render('wikiengine/article/body',
-                                {
-                                    article: article[Math.floor(Math.random() * al) % al],
-                                    login: undefined,
-                                    mkdn: require('markdown').markdown.toHTML
-                                }
-                            );
-                        }
-
-                        db.close();
-                    }
-                );
-            }
-        );
-    }
-);
-
-
-router.get('/engine/stash/markdown', function(req, res, next)
+router.get(
+    '/wiki/article',
+    function(req, res, next)
     {
-        res.render('engine/stash/markdown', {});
+        db.collection('articles').find({name: req.query["article"]}).toArray()
+        .then(function(articles){
+            return respSingleArticle(res, null, articles);
+        })
+        .catch(function(error){
+            return respError(res, null, error);
+        });
     }
 );
 
-router.post('/engine/stash/markdown-commit', function(req, res, next)
+router.get(
+    '/wiki/article-random',
+    function(req, res, next)
     {
-        res.render('engine/stash/markdown-commit', {markdown: req.body['markdown'], mkdn: require('markdown').markdown.toHTML});
+        db.collection('articles').find().toArray()
+        .then(function(articles){
+            return respRandomArticle(res, null, articles);
+        })
+        .catch(function(error){
+            return respError(res, null, error);
+        });
     }
 );
 
 module.exports = router;
+
+
+
+// Article content to Jade
+/*
+ var article = {
+ name: 'Meat Beat Manifest',
+ left: {
+ articleBrief: 'Meat beat manifest is a convention of efficient assassination technology. Meat beat manifest ' +
+ 'was declared in 2005 at the conference "Thug Life 2005" in Brooklyn, New York.'
+ },
+ right: {
+ category: 'Thug Life 2015',
+ imageUrl: '/m60.bmp',
+ tableContent: [
+ {
+ k: 'Year',
+ v: '2015'
+ },
+ {
+ k: 'Voices for',
+ v: '352'
+ },
+ {
+ k: 'Voices against',
+ v: '0'
+ }
+ ]
+ },
+ content: [
+ {
+ sectId: 0,
+ sectName: 'Deadbeef Industries GmbH',
+ sectContent: 'Usual participant'
+ },
+ {
+ sectId: 1,
+ sectName: 'Forcemeat, Inc.',
+ sectContent: 'Hardcore meaters'
+ },
+ {
+ sectId: 2,
+ sectName: 'Deadmeat & co.',
+ sectContent: 'Just choppers'
+ }
+ ],
+ links: [
+ {
+ label: 'Main page',
+ url: '/wiki/article?article=mb'
+ }
+ ]
+ };
+ */
+
+// require('../../logic/wikiengine/article');
+
+// return new Promise(
+//     function (rsl, rej)
+//     {
+//
+//     }
+// );

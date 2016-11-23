@@ -5,8 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var routes = require('./routes/wikiengine/wiki');
-
 var app = express();
 
 // view engine setup
@@ -21,7 +19,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
+app.use('/', require('./routes/wikiengine/wiki'));
+app.use('/', require('./routes/engine/stash/markdown'));
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -54,5 +53,10 @@ app.use(function (err, req, res, next) {
     });
 });
 
+
+
+app.set('dbName', 'wikiengine');
+app.set('dbHost', '127.0.0.1');
+app.set('dbPort', 27017);
 
 module.exports = app;
