@@ -19,7 +19,8 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', require('./routes/wikiengine/wiki'));
+app.use('/', require('./routes/root'));
+app.use('/', require('./routes/wiki/article'));
 app.use('/', require('./routes/engine/stash/markdown'));
 
 // catch 404 and forward to error handler
@@ -55,7 +56,7 @@ app.use(function (err, req, res, next) {
 
 
 
-app.set('dbName', 'wikiengine');
+app.set('dbName', 'wiki');
 app.set('dbHost', '127.0.0.1');
 app.set('dbPort', 27017);
 
