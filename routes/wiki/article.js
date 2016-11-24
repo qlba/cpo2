@@ -13,7 +13,7 @@ function respSingleArticle(res, login, art_arr)
         else if (art_arr.length > 1)
             rej(new Error('Ambiguity'));
         else
-            res.render('wikiengine/article/body',
+            res.render('wiki/article/body',
                 {
                     article: art_arr[0],
                     login: login,
@@ -31,7 +31,7 @@ function respRandomArticle(res, login, art_arr)
         else {
             var al = art_arr.length;
 
-            res.render('wikiengine/article/body',
+            res.render('wiki/article/body',
                 {
                     article: art_arr[Math.floor(Math.random() * al) % al],
                     login: login,
@@ -46,7 +46,7 @@ function respError(res, login, error)
 {
     return new Promise(function(rsl, rej){
         res.render(
-            'wikiengine/article/body',
+            'wiki/article/body',
             {
                 error: error.message,
                 login: login
@@ -60,7 +60,12 @@ router.get(
     '/wiki/article',
     function(req, res, next)
     {
-        db.collection('articles').find({name: req.query["article"]}).toArray()
+        new Promise(function(rsl, rej) {
+            req.query["article"] ? rsl({name: req.query["article"]}) : rej(new Error('Article not specified'));
+        })
+        .then(function(query){
+            return db.collection('articles').find(query).toArray();
+        })
         .then(function(articles){
             return respSingleArticle(res, null, articles);
         })
@@ -84,8 +89,8 @@ router.get(
     }
 );
 
-module.exports = router;
 
+module.exports = router;
 
 
 // Article content to Jade
@@ -140,7 +145,7 @@ module.exports = router;
  };
  */
 
-// require('../../logic/wikiengine/article');
+// require('../../logic/wiki/article');
 
 // return new Promise(
 //     function (rsl, rej)

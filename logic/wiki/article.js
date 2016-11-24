@@ -11,7 +11,7 @@
 //
 // function responseWithArticle(res, articleData, loginData)
 // {
-//     res.render('wikiengine/article/body',
+//     res.render('wiki/article/body',
 //         {
 //             article: articleData,
 //             mkdn: require('markdown').markdown.toHTML,
@@ -22,7 +22,7 @@
 //
 // function responseWithError(res, error, loginData)
 // {
-//     res.render('wikiengine/article/body',
+//     res.render('wiki/article/body',
 //         {
 //             error: message,
 //             login: loginData
@@ -152,7 +152,7 @@
 //                             else if (article.length > 1)
 //                                 respError(res, 'Ambiguity');
 //                             else
-//                                 res.render('wikiengine/article/body',
+//                                 res.render('wiki/article/body',
 //                                     {
 //                                         article: article[0],
 //                                         login: undefined,

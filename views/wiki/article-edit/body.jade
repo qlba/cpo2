@@ -14,25 +14,34 @@ extends ../generic/generic
 //        td.RightTableCell= k
 //        td.RightTableCell= v
 
+mixin articleSectionEditor(sectId, sectName, sectContent)
+    section.ArticleBodyBlock(id= "" + sectId)
+        form(action="/wiki/article-editor-commit", method="post")
+            input(type="hidden", name="sectId", value=sectId)
+            input(type="text", name="sectName", value=sectName)
+            h1= sectName
+            hr
+            != mkdn(sectContent)
+
 block head_data
     - var head = {};
-    - head.styles = ['/stylesheets/wikiengine/article-edit/main.css'];
+    - head.styles = ['/stylesheets/wiki/article-edit/main.css'];
     - head.title = !error ? article.name + ' - WikiEngine' : 'WikiEngine';
 
 block body
 
-    nav.Container#leftNavPanel
-        a(href="/").LeftPanelNavLink Main page
-        a(href="/wiki/article-random").LeftPanelNavLink Random article
-        hr
-        if (!error)
-            each val in article.links
-                a.LeftPanelNavLink(href=val.url)= val.label
+    //nav.Container#leftNavPanel
+    //    a(href="/").LeftPanelNavLink Main page
+    //    a(href="/wiki/article-random").LeftPanelNavLink Random article
+    //    hr
+    //    if (!error)
+    //        each val in article.links
+    //            a.LeftPanelNavLink(href=val.url)= val.label
 
     section.Container#articleBox
         if (!error)
             header.Container#articleHead
-                h1= article.name
+                h1= "Edit: " + article.name
                 hr
                 section.Container#articleHeadContent
                     section.Container#articleHeadLeft
