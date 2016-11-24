@@ -13,7 +13,7 @@ function respSingleArticle(res, login, art_arr)
         else if (art_arr.length > 1)
             rej(new Error('Ambiguity'));
         else
-            res.render('wiki/article/body',
+            res.render('article/body',
                 {
                     article: art_arr[0],
                     login: login,
@@ -31,7 +31,7 @@ function respRandomArticle(res, login, art_arr)
         else {
             var al = art_arr.length;
 
-            res.render('wiki/article/body',
+            res.render('article/body',
                 {
                     article: art_arr[Math.floor(Math.random() * al) % al],
                     login: login,
@@ -46,7 +46,7 @@ function respError(res, login, error)
 {
     return new Promise(function(rsl, rej){
         res.render(
-            'wiki/article/body',
+            'article/body',
             {
                 error: error.message,
                 login: login
@@ -57,7 +57,7 @@ function respError(res, login, error)
 
 
 router.get(
-    '/wiki/article',
+    '/article',
     function(req, res, next)
     {
         new Promise(function(rsl, rej) {
@@ -76,7 +76,7 @@ router.get(
 );
 
 router.get(
-    '/wiki/article-random',
+    '/article-random',
     function(req, res, next)
     {
         db.collection('articles').find().toArray()

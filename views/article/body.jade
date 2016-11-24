@@ -15,7 +15,7 @@ mixin rightTableRow(k, v)
 
 block head_data
     - var head = {};
-    - head.styles = ['/stylesheets/wiki/article/main.css'];
+    - head.styles = ['/stylesheets/article/main.css'];
     - head.title = !error ? article.name + ' - WikiEngine' : 'WikiEngine';
 
 block body
@@ -23,15 +23,15 @@ block body
         nav.Container#leftNavPanel
             h3.LinkGroup Routes (dev)
             hr
-            a(href="/wiki/article").LeftPanelNavLink /wiki/article
-            a(href="/wiki/article-random").LeftPanelNavLink /wiki/article-random
-            a(href="/engine/stash/markdown").LeftPanelNavLink /engine/stash/markdown
-            a(href="/engine/stash/markdown-commit").LeftPanelNavLink /engine/stash/markdown-commit
+            a(href="/article").LeftPanelNavLink /article
+            a(href="/article-random").LeftPanelNavLink /article-random
+            a(href="/_engine/stash/markdown").LeftPanelNavLink /engine/stash/markdown
+            a(href="/_engine/stash/markdown-commit").LeftPanelNavLink /engine/stash/markdown-commit
 
             h3.LinkGroup Generic
             hr
             a(href="/").LeftPanelNavLink Main page
-            a(href="/wiki/article-random").LeftPanelNavLink Random article
+            a(href="/article-random").LeftPanelNavLink Random article
 
             if (!error)
                 h3.LinkGroup Article specific links

@@ -16,7 +16,7 @@ extends ../generic/generic
 
 mixin articleSectionEditor(sectId, sectName, sectContent)
     section.ArticleBodyBlock(id= "" + sectId)
-        form(action="/wiki/article-editor-commit", method="post")
+        form(action="/article-editor-commit", method="post")
             input(type="hidden", name="sectId", value=sectId)
             input(type="text", name="sectName", value=sectName)
             h1= sectName
@@ -25,7 +25,7 @@ mixin articleSectionEditor(sectId, sectName, sectContent)
 
 block head_data
     - var head = {};
-    - head.styles = ['/stylesheets/wiki/article-edit/main.css'];
+    - head.styles = ['/stylesheets/article-edit/main.css'];
     - head.title = !error ? article.name + ' - WikiEngine' : 'WikiEngine';
 
 block body

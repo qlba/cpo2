@@ -4,7 +4,7 @@
 
 var router = require('express').Router();
 
-router.get('/', function(req, res, next){res.redirect('/wiki/article')});
+router.get('/', function(req, res, next){res.redirect('/article')});
 
 
 module.exports = router;
