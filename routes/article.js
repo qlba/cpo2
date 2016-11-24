@@ -2,6 +2,7 @@
  * Created by qlba on 27.10.2016.
  */
 
+
 var router = require('express').Router();
 
 
@@ -61,7 +62,9 @@ router.get(
     function(req, res, next)
     {
         new Promise(function(rsl, rej) {
-            req.query["article"] ? rsl({name: req.query["article"]}) : rej(new Error('Article not specified'));
+            req.query["article"] ?
+                rsl({name: req.query["article"]}) :
+                rej(new Error('Article name empty or not specified; main page redirects here'));
         })
         .then(function(query){
             return db.collection('articles').find(query).toArray();
@@ -91,6 +94,7 @@ router.get(
 
 
 module.exports = router;
+
 
 
 // Article content to Jade
