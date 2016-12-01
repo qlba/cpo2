@@ -3,74 +3,62 @@
  */
 
 
-var router = require('express').Router();
+var router = require("express").Router(),
+    db = require("../modules/db.js");
 
 
-function respSingleArticle(res, login, art_arr)
+function respArticle(res, login, art_arr)
 {
-    return new Promise(function(rsl, rej){
-        if (art_arr.length == 0)
-            rej(new Error('No such article'));
-        else if (art_arr.length > 1)
-            rej(new Error('Ambiguity'));
-        else
-            res.render('article/body',
-                {
-                    article: art_arr[0],
-                    login: login,
-                    mkdn: require('markdown').markdown.toHTML
-                }
-            );
-    });
-}
-
-function respRandomArticle(res, login, art_arr)
-{
-    return new Promise(function (rsl, rej){
-        if (art_arr.length == 0)
-            rej(new Error('Nothing to choose from'));
-        else {
-            var al = art_arr.length;
-
-            res.render('article/body',
-                {
-                    article: art_arr[Math.floor(Math.random() * al) % al],
-                    login: login,
-                    mkdn: require('markdown').markdown.toHTML
-                }
-            );
-        }
-    });
+    if (art_arr.length < 1)
+        throw new Error("No such article");
+    else if (art_arr.length > 1)
+        res.render("article/body",
+            {
+                error: "Search results:",
+                login: login,
+                addInfo: art_arr
+                    .map(function(a){return "<a href=\'article?article=" + a.name + "\'>" + a.name + "</a>"})
+                    .join("\<br\>")
+            }
+        );
+    else
+        res.render("article/body",
+            {
+                article: art_arr[0],
+                isEditing: true,
+                login: login,
+                mkdn: require("markdown").markdown.toHTML
+            }
+        );
 }
 
 function respError(res, login, error)
 {
-    return new Promise(function(rsl, rej){
-        res.render(
-            'article/body',
-            {
-                error: error.message,
-                login: login
-            }
-        );
-    });
+    res.render("article/body",
+        {
+            error: error.message,
+            login: login
+        }
+    );
 }
 
 
 router.get(
-    '/article',
+    "/article",
     function(req, res, next)
     {
+        var aq = req.query["article"];
+
         new Promise(function(rsl, rej) {
-            req.query["article"] ?
-                rsl({name: req.query["article"]}) :
-                rej(new Error('Article name empty or not specified; main page redirects here'));
+            aq ?
+                rsl({name: aq[0] == '#' ? {$regex: aq.substr(1)} : aq}) :
+                rej(new Error('Article not specified'));
         })
         .then(function(query){
             return db.collection('articles').find(query).toArray();
         })
         .then(function(articles){
-            return respSingleArticle(res, null, articles);
+            return respArticle(res, null, articles);
         })
         .catch(function(error){
             return respError(res, null, error);
@@ -79,13 +67,15 @@ router.get(
 );
 
 router.get(
-    '/article-random',
+    "/article-random",
     function(req, res, next)
     {
-        db.collection('articles').find().toArray()
+        db.collection('articles').aggregate([{$sample: {size: 1}}]).toArray()
+
         .then(function(articles){
-            return respRandomArticle(res, null, articles);
+            return respArticle(res, null, articles);
         })
+
         .catch(function(error){
             return respError(res, null, error);
         });

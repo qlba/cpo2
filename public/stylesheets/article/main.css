@@ -168,6 +168,21 @@ blockquote {
     clear: both;
 }
 
+
+.EditPanel {
+    padding: 4px;
+
+    background-color: #BFEDFF;
+    border-radius: 4px;
+    border: 1px solid #6188bb;
+
+    display: inline-block;
+}
+
+.EditPanel button {
+    margin: 4px;
+}
+
 /*
 Special colors:
 6188bb -- wikipedia darkened

@@ -24,19 +24,18 @@ block content
                         p
                             b Not
                             | logged in
-                        input(type="hidden", name="return", value="/article?article=" + title)
+                        //input(type="hidden", name="return", value="/article?article=" + title)
                         input(type="submit", value="Log in / Sign up")
                 else
                     form(action="/sys/login", method="get")
                         p Logged in as
                             b= login
-                        input(type="hidden", name="return", value="/article?article=" + title)
+                        //input(type="hidden", name="return", value="/article?article=" + title)
                         input(type="submit", value="Log out")
             | |
             section.Container.ActionBox
                 form(action="/article", method="get")
-                    input(type="search", name="article", autocomplete="on",
-                    placeholder="Search article...")
+                    input(type="search", name="article", autocomplete="on", placeholder="Search article, # for regex")#searchField
                     input(type="submit", value="Search")
 
     block body
@@ -48,3 +47,13 @@ block content
             a(href='/').FooterLink Privacy policy
             | |
             a(href='/').FooterLink About WikiEngine
+
+    if(isEditing)
+        script(src="javascripts/article_editor.js")
+        script(src="javascripts/markdown.min.js")
+
+    script
+        | var sf = document.getElementById("searchField");
+        | sf.oninput = function(){
+        |     sf.style.color = sf.value[0] == '#' ? "blue" : "black";
+        | };
