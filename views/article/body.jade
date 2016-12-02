@@ -8,21 +8,21 @@ mixin articleSection(sectId, sectName, sectContent)
         hr
         if(isEditing)
             div.EditPanel
-                button(onclick="alert(\"Renaming section #" + sectId + "\")")
+                button(onclick="initSectionRenamer(" + sectId + ")")
                     | Rename
-                button(onclick="initEditor(" + sectId + ")")
-                    // alert(\"Editing section #" + sectId + "\")
+                button(onclick="initSectionEditor(" + sectId + ")")
                     | Edit
                 button(onclick="alert(\"Moving section #" + sectId + "\")")
                     | Move
-                button(onclick="alert(\"Deleting section #" + sectId + "\")")
+                button(onclick="initSectionDeleter(" + sectId + ")")
                     | Delete
-                button(onclick="alert(\"Inserting section after #" + sectId + "\")")
+                button(onclick="initSectionInserter(" + sectId + ")")
                     | Insert After
         else
             button(onclick="alert(\"Forking article " + article.name + " form " + article._id + "\")")
                 | Edit As New Version
-        != mkdn(sectContent)
+        div
+            != mkdn(sectContent)
 
 mixin rightTableRow(k, v)
     tr
@@ -36,11 +36,6 @@ block head_data
     - head.title = !error ? article.name + ' - WikiEngine' : 'WikiEngine';
 
 block body
-
-    //script
-    //    | function initEditor(sectionId) {
-    //    |     document.getElementById('' + sectId).
-    //    | }
 
     if (!error && isEditing)
         script
@@ -83,8 +78,6 @@ block body
                         section.Container#articleBriefBox
                             if(isEditing)
                                 .EditPanel
-                                    button(onclick="alert(\"Renaming section #" + sectId + "\")")
-                                        | Rename Article
                                     button(onclick="alert(\"Editing section #" + sectId + "\")")
                                         | Edit Brief
                                     button(onclick="alert(\"Inserting section after #" + (-1) + "\")")
@@ -105,9 +98,9 @@ block body
                                         each val in article.content
                                             tr
                                                 td.ContentsListSectionId
-                                                    a(href="#" + val.sectId)= val.sectId + 1
+                                                    a(href="#" + article.content.indexOf(val))= article.content.indexOf(val) + 1
                                                 td.ContentsListSectionName
-                                                    a(href="#" + val.sectId)= val.sectName
+                                                    a(href="#" + article.content.indexOf(val))= val.sectName
 
                     section.Container#articleHeadRight
                         h3(align="center")= article.right.category
@@ -133,7 +126,7 @@ block body
 
             section.Container#articleBody
                 each val in article.content
-                    +articleSection(val.sectId, val.sectName, val.sectContent)
+                    +articleSection(article.content.indexOf(val), val.sectName, val.sectContent)
         else
             h1= error
             p!= addInfo
