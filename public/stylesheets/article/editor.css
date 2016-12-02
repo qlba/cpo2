@@ -1,6 +1,10 @@
-.EditorField {
-    display: block;
+.EditorForm * {
     margin: 8px;
+}
+
+.EditorForm textarea {
+    display: block;
+
 
     width: 98%;
 }

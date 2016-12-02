@@ -4,7 +4,8 @@
 
 
 var router = require("express").Router(),
-    db = require("../modules/db.js");
+    db = require("../modules/db.js"),
+    ObjectID = require("mongodb").ObjectID;
 
 
 function respArticle(res, login, art_arr)
@@ -58,10 +59,10 @@ router.get(
             return db.collection('articles').find(query).toArray();
         })
         .then(function(articles){
-            return respArticle(res, null, articles);
+            respArticle(res, null, articles);
         })
         .catch(function(error){
-            return respError(res, null, error);
+            respError(res, null, error);
         });
     }
 );
@@ -73,12 +74,37 @@ router.get(
         db.collection('articles').aggregate([{$sample: {size: 1}}]).toArray()
 
         .then(function(articles){
-            return respArticle(res, null, articles);
+            res.redirect("/article?article=" + articles[0].name);
         })
 
         .catch(function(error){
-            return respError(res, null, error);
+            respError(res, null, error);
         });
+    }
+);
+
+
+router.post(
+    "/article-edit-section",
+    function(req, res, next)
+    {
+        var updOper = {};
+        updOper["content." + req.body['asid'] + ".sectContent"] = req.body['newcontent'];
+
+
+        db.collection('articles').updateOne({_id: ObjectID(req.body['aid'])}, {$set: updOper})
+
+        .then(function(){
+            res.redirect('back');
+        })
+
+        .catch(function(error){
+            respError(res, null, error);
+        });
+        
+        // respError(res, null, new Error("Not implemented"));
+
+        // console.log(req.body);
     }
 );
 
