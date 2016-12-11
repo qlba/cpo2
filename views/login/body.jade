@@ -1,0 +1,33 @@
+
+extends ../generic/generic
+
+
+block head_data
+    - var head = {};
+    - head.styles = ['/stylesheets/login/main.css'];
+    - head.title = 'Log in WikiEngine';
+
+block body
+
+    input(type="hidden", value=key)#publicKey
+
+    #loginDiv(align="center")
+        div#loginForm
+            table
+                tr
+                    td
+                        | Username
+                    td
+                        input(type="text")#usernameField
+                tr
+                    td
+                        | Password
+                    td
+                        input(type="password")#passwordField
+                tr
+                    td(colspan="2", align="center")
+                        button#submitButton Authenticate
+    div(align="center")
+        #statusLine
+
+    script(src="/javascripts/login/main.js")

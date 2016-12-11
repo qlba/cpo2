@@ -1,6 +1,3 @@
-/**
- * Created by qlba on 01.12.2016.
- */
 
 function initSectionEditor(sid)
 {
@@ -109,15 +106,18 @@ function initSectionRenamer(sid)
 
 function initSectionDeleter(sid)
 {
-    var params = {
-        aid: article._id,
-        asid: sid
-    };
-    
-    post("/article-delete-section", params);
+    var r = confirm("Delete section \"" + article.content[sid].sectName + "\"?");
+
+    if (r == true)
+    {
+        var params = {
+            aid: article._id,
+            asid: sid
+        };
+
+        post("/article-delete-section", params);
+    }
 }
-
-
 
 function initSectionInserter(sid)
 {

@@ -1,19 +1,26 @@
-/**
- * Created by qlba on 01.12.2016.
- */
 
 const connString = "mongodb://127.0.0.1:27017/wikiengine";
+const mongodb = require("mongodb");
 
-module.exports.init = function (options, callback)
+exports.init = function (options, callback)
 {
-    require("mongodb").MongoClient.connect(connString, options,
-        function(err, db) {
-            if(err)
+    mongodb.MongoClient.connect(connString, options,
+        function(err, db)
+        {
+            if(err) {
                 callback(err, null);
-            else {
+            } else {
+                db.ObjectID = mongodb.ObjectID;
                 module.exports = db;
+
                 callback(null, db);
             }
         }
     );
 };
+
+
+// {
+//     for (var i in db) {
+//         exports[i] = db[i];
+// }

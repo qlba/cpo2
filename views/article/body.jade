@@ -1,4 +1,3 @@
-// Created by qlba on 27.10.2016.
 
 extends ../generic/generic
 
@@ -8,12 +7,10 @@ mixin articleSection(sectId, sectName, sectContent)
         hr
         if(isEditing)
             div.EditPanel
-                button(onclick="initSectionRenamer(" + sectId + ")")
-                    | Rename
                 button(onclick="initSectionEditor(" + sectId + ")")
                     | Edit
-                button(onclick="alert(\"Moving section #" + sectId + "\")")
-                    | Move
+                button(onclick="initSectionRenamer(" + sectId + ")")
+                    | Rename
                 button(onclick="initSectionDeleter(" + sectId + ")")
                     | Delete
                 button(onclick="initSectionInserter(" + sectId + ")")
@@ -48,8 +45,6 @@ block body
         hr
         a(href="/article").LeftPanelNavLink /article
         a(href="/article-random").LeftPanelNavLink /article-random
-        a(href="/_engine/stash/markdown").LeftPanelNavLink /engine/stash/markdown
-        a(href="/_engine/stash/markdown-commit").LeftPanelNavLink /engine/stash/markdown-commit
 
         h3.LinkGroup Generic
         hr
@@ -122,11 +117,16 @@ block body
                                     button(onclick="alert(\"Editing table content\")")
                                         | Edit Table Content
 
-
-
+            // Article content in markdown
             section.Container#articleBody
                 each val in article.content
                     +articleSection(article.content.indexOf(val), val.sectName, val.sectContent)
+
+            // Include scripts for editing
+            if(isEditing)
+                script(src="javascripts/article/article_editor.js")
+                script(src="javascripts/markdown.js")
+
         else
             h1= error
             p!= addInfo

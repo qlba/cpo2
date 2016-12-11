@@ -1,0 +1,37 @@
+#loginDiv div {
+    border: solid 1px #BFBFBF;
+    border-radius: 8px;
+
+    display: inline-block;
+    padding: 8px;
+
+    margin: 16px;
+
+    background-color: #EFEFEF;
+}
+
+#loginDiv td {
+    padding: 8px;
+}
+
+#statusLine {
+    padding: 8px;
+    margin: 16px;
+
+    border: solid 1px;
+    border-radius: 4px;
+
+    display: inline-block;
+}
+
+.StatusOk {
+    border-color: #00BF00;
+    background-color: #EFFFEF;
+    color: #007F00;
+}
+
+.StatusFail {
+    border-color: #BF0000;
+    background-color: #FFEFEF;
+    color: #7F0000;
+}

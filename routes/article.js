@@ -1,18 +1,20 @@
-/**
- * Created by qlba on 27.10.2016.
- */
-
 
 var router = require("express").Router(),
     db = require("../modules/db.js"),
     ObjectID = require("mongodb").ObjectID;
 
 
+function loginName(req)
+{
+    return req.user ? req.user.username : null;
+}
+
 function respArticle(res, login, art_arr)
 {
     if (art_arr.length < 1)
         throw new Error("No such article");
-    else if (art_arr.length > 1)
+    
+    if (art_arr.length > 1)
         res.render("article/body",
             {
                 error: "Search results:",
@@ -49,20 +51,20 @@ router.get(
     function(req, res, next)
     {
         var aq = req.query["article"];
-
-        new Promise(function(rsl, rej) {
+        
+        new Promise(function(resolve, reject) {
             aq ?
-                rsl({name: aq[0] == '#' ? {$regex: aq.substr(1)} : aq}) :
-                rej(new Error('Article not specified'));
+                resolve({name: aq[0] === '#' ? {$regex: aq.substr(1)} : aq}) :
+                reject(new Error('Article not specified'));
         })
         .then(function(query){
             return db.collection('articles').find(query).toArray();
         })
         .then(function(articles){
-            respArticle(res, null, articles);
+            respArticle(res, req.user, articles);
         })
         .catch(function(error){
-            respError(res, null, error);
+            respError(res, req.user, error);
         });
     }
 );
@@ -78,113 +80,11 @@ router.get(
         })
 
         .catch(function(error){
-            respError(res, null, error);
+            respError(res, req.user, error);
         });
     }
 );
 
-
-router.post(
-    "/article-edit-section",
-    function(req, res, next)
-    {
-        var updOper = {};
-        updOper["content." + req.body['asid'] + ".sectContent"] = req.body['newcontent'];
-
-
-        db.collection('articles').updateOne({_id: ObjectID(req.body['aid'])}, {$set: updOper})
-
-        .then(function(){
-            res.redirect('back');
-        })
-
-        .catch(function(error){
-            respError(res, null, error);
-        });
-        
-        // respError(res, null, new Error("Not implemented"));
-
-        // console.log(req.body);
-    }
-);
-
-router.post(
-    "/article-rename-section",
-    function(req, res, next)
-    {
-        var updOper = {};
-        updOper["content." + req.body['asid'] + ".sectName"] = req.body['newname'];
-
-
-        db.collection('articles').updateOne({_id: ObjectID(req.body['aid'])}, {$set: updOper})
-
-            .then(function(){
-                res.redirect('back');
-            })
-
-            .catch(function(error){
-                respError(res, null, error);
-            });
-
-        // respError(res, null, new Error("Not implemented"));
-
-        // console.log(req.body);
-    }
-);
-
-router.post(
-    "/article-delete-section",
-    function(req, res, next)
-    {
-        db.collection('articles').findOne({_id: ObjectID(req.body['aid'])})
-
-            .then(function(doc){
-                doc.content.splice(req.body['asid'], 1);
-                db.collection('articles').save(doc);
-            })
-
-            .then(function(){
-                res.redirect('back');
-            })
-
-            .catch(function(error){
-                respError(res, null, error);
-            });
-
-        // respError(res, null, new Error("Not implemented"));
-
-        // console.log(req.body);
-    }
-);
-
-
-router.post(
-    "/article-insert-section",
-    function(req, res, next)
-    {
-        db.collection('articles').findOne({_id: ObjectID(req.body['aid'])})
-
-            .then(function(doc){
-                doc.content.splice(
-                    +req.body['asid'] + 1,
-                    0,
-                    {
-                        "sectName": "SECTION " + (+req.body['asid'] + 1),
-                        "sectContent": ""}
-                );
-                db.collection('articles').save(doc);
-            })
-
-            .then(function(){
-                res.redirect('back');
-            })
-
-            .catch(function(error){
-                respError(res, null, error);
-            });
-
-    }
-);
 
 
 module.exports = router;

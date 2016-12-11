@@ -1,5 +1,3 @@
-//
-   Created by qlba on 10.11.2016.
 
 extends _html
 
@@ -8,6 +6,8 @@ block head_data_full
     - head.styles.push('/stylesheets/generic/headerfooter.css');
 
 block content
+
+    script(src="/javascripts/jquery.js")
 
     header.Container#pageHeader
         header.Container#mainLogoHeader
@@ -20,18 +20,23 @@ block content
         div.Container
             section.Container.ActionBox
                 if(!login)
-                    form(action="/sys/login", method="get")
+                    form(action="/login", method="get")
                         p
                             b Not
                             | logged in
                         //input(type="hidden", name="return", value="/article?article=" + title)
                         input(type="submit", value="Log in / Sign up")
                 else
-                    form(action="/sys/login", method="get")
+                    form
                         p Logged in as
-                            b= login
-                        //input(type="hidden", name="return", value="/article?article=" + title)
-                        input(type="submit", value="Log out")
+                            b= login.username
+                        input(type="button", value="Log out")#logoutButton
+                    script
+                        | $('#logoutButton').on('click', function(){
+                        |   $.post('/logout')
+                        |     .done(function(){location = location;});
+                        | });
+
             | |
             section.Container.ActionBox
                 form(action="/article", method="get")
@@ -40,20 +45,17 @@ block content
 
     block body
 
-    footer.Container#mainFooter
-        p(align="center")
-            a(href='/').FooterLink WikiEngine developers
-            | |
-            a(href='/').FooterLink Privacy policy
-            | |
-            a(href='/').FooterLink About WikiEngine
-
-    if(isEditing)
-        script(src="javascripts/article_editor.js")
-        script(src="javascripts/markdown.min.js")
+    footer.Container#pageFooter
+        div(align="center")
+            div#footerLinkBlock
+                a(href='/').FooterLink WikiEngine developers
+                | |
+                a(href='/').FooterLink Privacy policy
+                | |
+                a(href='/').FooterLink About WikiEngine
 
     script
-        | var sf = document.getElementById("searchField");
-        | sf.oninput = function(){
-        |     sf.style.color = sf.value[0] == '#' ? "blue" : "black";
-        | };
+        | var sf = $('#searchField');
+        | sf.on('input', function(){
+        |     sf.css('color', sf.val()[0] == '#' ? "blue" : "black");
+        | });
