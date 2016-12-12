@@ -9,6 +9,8 @@ block head_data
 
 block body
 
+    script(src="/javascripts/login/cryptography/crypt.js")
+
     input(type="hidden", value=key)#publicKey
 
     #loginDiv(align="center")
@@ -18,15 +20,17 @@ block body
                     td
                         | Username
                     td
-                        input(type="text")#usernameField
+                        input(type="text" placeholder="Username")#usernameField
                 tr
                     td
                         | Password
                     td
-                        input(type="password")#passwordField
+                        input(type="password" placeholder="Password")#passwordField
                 tr
-                    td(colspan="2", align="center")
-                        button#submitButton Authenticate
+                    td(colspan="2" align="center")
+                        button#submitButton Log in
+                        button#signupButton Sign up
+
     div(align="center")
         #statusLine
 

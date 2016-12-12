@@ -1,28 +1,70 @@
 
-var db = require("../modules/db.js");
-
-var passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy;
-
+var rsa = new require('node-rsa')(),
+    sha = require('../modules/hash'),
+    db = require("../modules/db.js"),
+    passport = require('passport'),
+    LocalStrategy = require('passport-local').Strategy,
+    rsaKeyPair = rsa.generateKeyPair(2048, 65537);
 
 function validatePassword(actual, expected)
 {
-    return actual === expected;
+    actual = new Buffer(actual, 'base64');
+
+    console.log(actual);
+
+    console.log('Before fail');
+    console.log(rsaKeyPair.decrypt(actual));
+    console.log(rsaKeyPair.decrypt(actual).toString());
+    console.log(sha.SHA256(rsaKeyPair.decrypt(actual)).toString());
+    console.log('After fail');
+
+
+    return sha.SHA256(rsaKeyPair.decrypt(actual)).toString() === expected;
+
+    // return sha.SHA256(rsaKeyPair.decrypt(actual)) === expected;
 }
 
-passport.serializeUser(
-    (user, done) => {
-        done(null, user._id);
-    }
-);
+function signUp(username, password, done)
+{
+    db.collection('users').findOne({ username: username }, (err, user) =>
+    {
+        if(err) {
+            console.log(err);
+            return done('Internal error');
+        }
 
-passport.deserializeUser(
-    (_id, done) => {
-        db.collection('users').findOne({_id: db.ObjectID(_id)},
-            (err, user) => { done(err, user); }
-        );
-    }
-);
+        if (user) {
+            return done('Username already taken');
+        }
+
+        db.collection('users').insertOne({
+            username: username,
+            password: sha.SHA256(rsaKeyPair.decrypt(password)).toString(),
+            status: "u",
+            permissions: [],
+            quota_left: [],
+            bans: []
+        }, (err) => {
+            if(err) {
+                console.log(err);
+                return done('Internal error');
+            }
+
+            return done(null);
+        });
+    });
+}
+
+
+passport.serializeUser((user, done) => {
+    done(null, user._id);
+});
+
+passport.deserializeUser((_id, done) => {
+    db.collection('users').findOne({_id: db.ObjectID(_id)},
+        (err, user) => { done(err, user); }
+    );
+});
 
 passport.use(
     new LocalStrategy(
@@ -34,8 +76,13 @@ passport.use(
                             return done(null, false, { message: 'Incorrect username' });
                         }
 
-                        if (!validatePassword(password, user.password)) {
-                            return done(null, false, { message: 'Incorrect password' });
+                        try {
+                            if (!validatePassword(password, user.password)) {
+                                return done(null, false, {message: 'Incorrect password'});
+                            }
+                        } catch (err) {
+                            console.log(err);
+                            return done(null, false, {message: 'Error occurred while checking password'});
                         }
 
                         return done(null, user);
@@ -48,3 +95,5 @@ passport.use(
 
 
 module.exports = passport;
+module.exports.publicKey = rsaKeyPair.exportKey('public');
+module.exports.signup = signUp;
