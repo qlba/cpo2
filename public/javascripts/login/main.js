@@ -1,50 +1,29 @@
 
 var statusLine = $('#statusLine');
-var button = $('#submitButton');
 
 statusLine.slideUp(0);
 
 
-button.on('click', () => {
+$('#submitButton').on('click', () => {continueAuth('/login', '/');});
+$('#signupButton').on('click', () => {continueAuth('/signup', '/login');});
 
+function continueAuth(url, redirect)
+{
     var userName = $('#usernameField').val(),
         password = $('#passwordField').val(),
         publicKey = $('#publicKey').val();
 
-    button.attr('disabled', true);
+    password = _encrypt(password, publicKey);
+    password = btoa(String.fromCharCode.apply(null, password));
 
-    
-
-
-
-
-    $.get('/login/encrypt', {username: userName}, (data) => {
-            continueAuth(data);
-        }).fail(() => {
-            window.alert('Failed');
-            button.attr('disabled', false);
-        });
-});
-
-function continueAuth(data)
-{
-    var userName = $('#usernameField').val();
-    var password = $('#passwordField').val();
-
-
-
-    
-
-    $.post('/login', {username: userName, password: password})
-        .done((data, textStatus, jqXHR) => {
+    $.post(url, {username: userName, password: password})
+        .done((data) => {
             displayMessage(data);
-            setTimeout(() => {window.location = "/";}, 1500);
+            setTimeout(() => {window.location = redirect;}, 1500);
         })
         .fail((jqXHR) => {
             displayMessage(jqXHR.statusCode().responseText, true);
         });
-
-    button.attr('disabled', false);
 }
 
 function displayMessage(message, fail)
