@@ -3,8 +3,12 @@ var rsa = new require('node-rsa')(),
     sha = require('../modules/hash'),
     db = require("../modules/db.js"),
     passport = require('passport'),
-    LocalStrategy = require('passport-local').Strategy,
-    rsaKeyPair = rsa.generateKeyPair(2048, 65537);
+    LocalStrategy = require('passport-local').Strategy;
+
+console.log("Generating RSA key pair...");
+var rsaKeyPair = rsa.generateKeyPair(2048, 65537);
+console.log("Finished generating RSA key pair");
+
 
 function validatePassword(actual, expected)
 {

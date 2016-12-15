@@ -1,89 +1,99 @@
 
 extends ../generic/generic
 
-mixin articleSection(sectId, sectName, sectContent)
-    section.ArticleBodyBlock(id= "" + sectId)
-        h1= sectName
+
+mixin linksEditPanel
+    .EditPanel
+        button(onclick="alert(\"Editing links\")")
+            | Edit links
+
+mixin briefEditPanel
+    .EditPanel(style="margin-top: 8px")
+        button(onclick="initBriefEditor()")
+            | Edit Brief
+        button(onclick="initSectionInserter(" + (-1) + ")")
+            | Insert First Section
+
+mixin tableEditPanel
+    .EditPanel
+        button(onclick="initTableRenamer()")
+            | Rename Table
+        button(onclick="alert(\"Uploading new image\")")
+            | Upload Image
+        button(onclick="initTableEditor()")
+            | Edit Table Content
+
+mixin sectionEditPanel(id)
+    .EditPanel
+        button(onclick="initSectionEditor(" + id + ")")
+            | Edit
+        button(onclick="initSectionRenamer(" + id + ")")
+            | Rename
+        button(onclick="initSectionDeleter(" + id + ")")
+            | Delete
+        button(onclick="initSectionInserter(" + id + ")")
+            | Insert After
+
+
+mixin articleSection(id, name, text)
+    section.ArticleBodyBlock(id= "" + id)
+        h1= name
         hr
         if(isEditing)
-            div.EditPanel
-                button(onclick="initSectionEditor(" + sectId + ")")
-                    | Edit
-                button(onclick="initSectionRenamer(" + sectId + ")")
-                    | Rename
-                button(onclick="initSectionDeleter(" + sectId + ")")
-                    | Delete
-                button(onclick="initSectionInserter(" + sectId + ")")
-                    | Insert After
-        else
-            button(onclick="alert(\"Forking article " + article.name + " form " + article._id + "\")")
-                | Edit As New Version
+            +sectionEditPanel(id)
         div
-            != mkdn(sectContent)
+            != markdown(text)
 
 mixin rightTableRow(k, v)
     tr
-        td.RightTableCell= k
-        td.RightTableCell= v
+        td.RightTableCell(align="right")= k
+        td.RightTableCell(align="left")= v
 
 
 block head_data
     - var head = {};
     - head.styles = ['/stylesheets/article/main.css', '/stylesheets/article/editor.css'];
-    - head.title = !error ? article.name + ' - WikiEngine' : 'WikiEngine';
+    - head.title = title ? title + ' - WikiEngine' : 'WikiEngine';
+
 
 block body
 
-    if (!error && isEditing)
+    if (article && isEditing)
         script
             | var article =
             != JSON.stringify(article)
             | ;
+            | article._id =
+            != "\"" + metaInfo._id + "\""
+            | ;
 
     nav.Container#leftNavPanel
-        h3.LinkGroup Routes (dev)
-        hr
-        a(href="/article").LeftPanelNavLink /article
-        a(href="/article-random").LeftPanelNavLink /article-random
-
-        h3.LinkGroup Generic
+        h3.LinkGroup Go to
         hr
         a(href="/").LeftPanelNavLink Main page
         a(href="/article-random").LeftPanelNavLink Random article
-
-        if (!error)
+        if (article)
             h3.LinkGroup Article specific links
             hr
             each val in article.links
                 a.LeftPanelNavLink(href=val.url)= val.label
+            div(style="height: 10px")
             if(isEditing)
-                div(style="height: 10px")
-                .EditPanel
-                    button(onclick="alert(\"Editing links\")")
-                        | Edit links
-
+                +linksEditPanel()
 
     section.Container#articleBox
         if (!error)
             header.Container#articleHead
-                h1= article.name
-                hr
+                h1= title
+                div(style="border-bottom: solid 1px black")
                 section.Container#articleHeadContent
                     section.Container#articleHeadLeft
+
                         section.Container#articleBriefBox
                             if(isEditing)
-                                .EditPanel
-                                    button(onclick="alert(\"Editing section #" + sectId + "\")")
-                                        | Edit Brief
-                                    button(onclick="alert(\"Inserting section after #" + (-1) + "\")")
-                                        | Insert First Section
-                            else
-                                button(onclick="alert(\"Forking article " + article.name + " form " + article._id + "\")")
-                                    | Edit As New Version
-
-                            != mkdn(article.left.articleBrief)
-
-
+                                +briefEditPanel()
+                            div
+                                != markdown(article.brief)
 
                         section.Container#articleContentsListBox
                             section#articleContentsList
@@ -95,38 +105,45 @@ block body
                                                 td.ContentsListSectionId
                                                     a(href="#" + article.content.indexOf(val))= article.content.indexOf(val) + 1
                                                 td.ContentsListSectionName
-                                                    a(href="#" + article.content.indexOf(val))= val.sectName
+                                                    a(href="#" + article.content.indexOf(val))= val.name
 
                     section.Container#articleHeadRight
-                        h3(align="center")= article.right.category
+                        h3(align="center")= article.tableName
                         section.Container#articleRightTableBox
                             p#imageParagraph(align="center")
-                                img#rightTableImage(src=article.right.imageUrl)
-                            table
-                                tbody
-                                    each val in article.right.tableContent
-                                        +rightTableRow(val.k, val.v)
+                                img#rightTableImage(src=article.image)
+                                table
+                                    tbody#rightTable
+                                        each val in article.table
+                                            +rightTableRow(val.k, val.v)
                         if(isEditing)
                             div(style="height: 10px")
                             div(align="center")
-                                div.EditPanel
-                                    button(onclick="alert(\"Renaming table\")")
-                                        | Rename Table
-                                    button(onclick="alert(\"Uploading new image\")")
-                                        | Upload Image
-                                    button(onclick="alert(\"Editing table content\")")
-                                        | Edit Table Content
+                                +tableEditPanel()
 
             // Article content in markdown
             section.Container#articleBody
                 each val in article.content
-                    +articleSection(article.content.indexOf(val), val.sectName, val.sectContent)
+                    +articleSection(article.content.indexOf(val), val.name, val.text)
 
-            // Include scripts for editing
-            if(isEditing)
-                script(src="javascripts/article/article_editor.js")
-                script(src="javascripts/markdown.js")
+            div(style="height: 100px; border-bottom: dashed 1px black")
+            p= "Version ID " + metaInfo._id + ", owned by " + metaInfo.ownerName + ", last edited " + metaInfo.updated.toLocaleString()
+            p
+                a(href="/article-versions?article=" + metaInfo.articleid) All versions of this page
+
+            script(src="javascripts/article/article_editor.js")
+            script(src="javascripts/markdown.js")
+
+            if(!isEditing)
+                .EditPanel(style="margin-bottom: 16px")
+                    if(!login)
+                        | Log in to edit
+                    else if(metaInfo.owner.toString() == login._id.toString())
+                        button(onclick="location = location + \"&forEdit=1\"")
+                            | Edit this page
+                    else
+                        button(onclick="post(\"/article-clone\", {aid: \"" + metaInfo._id + "\"})")
+                            | Create your version
 
         else
             h1= error
-            p!= addInfo

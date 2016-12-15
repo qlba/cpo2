@@ -1,0 +1,32 @@
+
+extends ../generic/generic
+
+block head_data
+    - var head = {};
+    - head.styles = ['/stylesheets/article/versions.css'];
+    - head.title = 'WikiEngine';
+
+block body
+    div(style="padding: 16px")
+        h1= "Versions of \"" + title + "\""
+        table
+            thead
+                td(align="center").Cell
+                    p Identifier
+                td(align="center").Cell
+                    p Owner
+                td(align="center").Cell
+                    p Updated
+                td(align="center").Cell
+                    p Created
+            tbody
+                each version in versions
+                    tr
+                        td.Cell
+                            a(href="/article?version=" + version._id.toString())= version._id.toString()
+                        td.Cell
+                            =version.ownerName.toString()
+                        td.Cell
+                            =version.updated.toLocaleString()
+                        td.Cell
+                            =version.created.toLocaleString()

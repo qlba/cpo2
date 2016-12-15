@@ -162,6 +162,8 @@ blockquote {
 .RightTableCell {
     font-size: 80%;
     padding: 3px;
+
+    vertical-align: top;
 }
 
 #articleBody {

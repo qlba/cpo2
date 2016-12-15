@@ -1,41 +1,68 @@
 
 var router = require("express").Router(),
     db = require("../modules/db.js"),
-    ObjectID = require("mongodb").ObjectID;
+    ObjectID = db.ObjectID;
 
 
-function loginName(req)
+function processArticleRequest(res, login, req_article, req_version)
 {
-    return req.user ? req.user.username : null;
+    if(req_version) {
+        responseWithArticleVersion(res, login, req_version);
+    } else if(req_article) {
+        responseWithArticle(res, login, req_article);
+    } else {
+        throw new Error("Bad request");
+    }
 }
 
-function respArticle(res, login, art_arr)
+function responseWithArticle(res, login, req_article)
 {
-    if (art_arr.length < 1)
-        throw new Error("No such article");
-    
-    if (art_arr.length > 1)
-        res.render("article/body",
-            {
-                error: "Search results:",
-                login: login,
-                addInfo: art_arr
-                    .map(function(a){return "<a href=\'article?article=" + a.name + "\'>" + a.name + "</a>"})
-                    .join("\<br\>")
-            }
-        );
-    else
-        res.render("article/body",
-            {
-                article: art_arr[0],
-                isEditing: true,
-                login: login,
-                mkdn: require("markdown").markdown.toHTML
-            }
-        );
+    var query = {name: req_article[0] === '#' ? {$regex: req_article.substr(1)} : req_article};
+
+    db.collection('articles').find(query).toArray((err, articles) => {
+        switch (articles.length) {
+            case 0:
+                throw new Error("No such article");
+            case 1:
+                responseWithArticleVersion(res, login, articles[0].main_version);
+                break;
+            default:
+                res.render("article/ambiguity", {
+                        articles: articles.map((article) => {
+                            return {name: article.name, link: '/article?article=' + article.name};
+                        }),
+                        login: login
+                    }
+                );
+                break;
+        }
+    });
 }
 
-function respError(res, login, error)
+function responseWithArticleVersion(res, login, req_version)
+{
+    db.collection("article_versions").findOne({_id: ObjectID(req_version)}, (err, version) =>
+    {
+        if(err) {
+            throw err;
+        }
+
+        if(!version) {
+            throw new Error("Article version not found");
+        }
+
+        res.render('article/body', {
+            title: version.name,
+            article: version.content,
+            metaInfo: version,
+            isEditing: !!res.forEdit,
+            login: login,
+            markdown: require("markdown").markdown.toHTML
+        });
+    });
+}
+
+function responseWithError(res, login, error)
 {
     res.render("article/body",
         {
@@ -46,108 +73,55 @@ function respError(res, login, error)
 }
 
 
-router.get(
-    "/article",
-    function(req, res, next)
+router.get("/article", (req, res) =>
     {
-        var aq = req.query["article"];
-        
-        new Promise(function(resolve, reject) {
-            aq ?
-                resolve({name: aq[0] === '#' ? {$regex: aq.substr(1)} : aq}) :
-                reject(new Error('Article not specified'));
-        })
-        .then(function(query){
-            return db.collection('articles').find(query).toArray();
-        })
-        .then(function(articles){
-            respArticle(res, req.user, articles);
-        })
-        .catch(function(error){
-            respError(res, req.user, error);
-        });
+        var requestedArticle = req.query.article;
+        var requestedVersion = req.query.version;
+
+        if(req.query.forEdit) {
+            res.forEdit = !!req.user;
+        }
+
+        try {
+            processArticleRequest(res, req.user, requestedArticle, requestedVersion);
+        } catch(err) {
+            responseWithError(res, req.user, err);
+        }
     }
 );
 
-router.get(
-    "/article-random",
-    function(req, res, next)
+router.get("/article-versions", (req, res) =>
     {
-        db.collection('articles').aggregate([{$sample: {size: 1}}]).toArray()
+        db.collection("article_versions").find({articleid: ObjectID(req.query.article.toString())}).toArray()
+            .then((versions) => {
+                if(versions.length === 0) {
+                    throw new Error("No versions of this page");
+                }
 
-        .then(function(articles){
+                res.render("article/versions", {
+                    title: versions[0].name,
+                    versions: versions
+                });
+            })
+            .catch((err) => {
+                responseWithError(res, req.user, err);
+            });
+    }
+);
+
+router.get("/article-random", (req, res) =>
+    {
+        db.collection('articles').aggregate([{$sample: {size: 1}}]).toArray((err, articles) =>
+        {
+            if(err || !articles) {
+                responseWithError(res, req.user, new Error("Error occurred"));
+            }
+
             res.redirect("/article?article=" + articles[0].name);
-        })
-
-        .catch(function(error){
-            respError(res, req.user, error);
         });
     }
 );
-
 
 
 module.exports = router;
-
-
-
-// Article content to Jade
-/*
- var article = {
- name: 'Meat Beat Manifest',
- left: {
- articleBrief: 'Meat beat manifest is a convention of efficient assassination technology. Meat beat manifest ' +
- 'was declared in 2005 at the conference "Thug Life 2005" in Brooklyn, New York.'
- },
- right: {
- category: 'Thug Life 2015',
- imageUrl: '/m60.bmp',
- tableContent: [
- {
- k: 'Year',
- v: '2015'
- },
- {
- k: 'Voices for',
- v: '352'
- },
- {
- k: 'Voices against',
- v: '0'
- }
- ]
- },
- content: [
- {
- sectId: 0,
- sectName: 'Deadbeef Industries GmbH',
- sectContent: 'Usual participant'
- },
- {
- sectId: 1,
- sectName: 'Forcemeat, Inc.',
- sectContent: 'Hardcore meaters'
- },
- {
- sectId: 2,
- sectName: 'Deadmeat & co.',
- sectContent: 'Just choppers'
- }
- ],
- links: [
- {
- label: 'Main page',
- url: '/wiki/article?article=mb'
- }
- ]
- };
- */
-
-// require('../../logic/wiki/article');
-
-// return new Promise(
-//     function (rsl, rej)
-//     {
-//
-//     }
-// );
+module.exports.responseWithError = responseWithError;

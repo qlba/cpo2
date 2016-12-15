@@ -1,0 +1,15 @@
+
+extends ../generic/generic
+
+block head_data
+    - var head = {};
+    - head.styles = ['/stylesheets/article/main.css'];
+    - head.title = 'WikiEngine';
+
+block body
+    div(style="padding: 16px")
+        h1 Search results
+        ol
+            each article in articles
+                li
+                    a(href=article.link)= article.name
