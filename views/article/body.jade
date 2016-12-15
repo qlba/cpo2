@@ -4,7 +4,7 @@ extends ../generic/generic
 
 mixin linksEditPanel
     .EditPanel
-        button(onclick="alert(\"Editing links\")")
+        button(onclick="initLinkEditor()")
             | Edit links
 
 mixin briefEditPanel
@@ -18,7 +18,7 @@ mixin tableEditPanel
     .EditPanel
         button(onclick="initTableRenamer()")
             | Rename Table
-        button(onclick="alert(\"Uploading new image\")")
+        button(onclick="initImageUploader()")
             | Upload Image
         button(onclick="initTableEditor()")
             | Edit Table Content
@@ -74,9 +74,9 @@ block body
         a(href="/article-random").LeftPanelNavLink Random article
         if (article)
             h3.LinkGroup Article specific links
-            hr
+            hr#beforeUserLinks
             each val in article.links
-                a.LeftPanelNavLink(href=val.url)= val.label
+                a.LeftPanelNavLink.UserLink(href=val.url)= val.label
             div(style="height: 10px")
             if(isEditing)
                 +linksEditPanel()
@@ -146,4 +146,4 @@ block body
                             | Create your version
 
         else
-            h1= error
+            h1!= error

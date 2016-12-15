@@ -263,6 +263,102 @@ function initTableEditor()
     removePanels();
 }
 
+function initLinkEditor()
+{
+    var aboveLinksRuler = $("#beforeUserLinks");
+
+    var form = $("<form/>", {
+        method: "post",
+        action: "/article-edit-links",
+        class: "EditorForm"
+    });
+
+    var field = $("<textarea/>", {
+        name: "newcontent",
+        wrap: "soft",
+        placeholder: "Syntax: <label> RETURN <url> RETURN RETURN"
+    });
+    field.val(unparseLinks(article.links));
+    field.on("input", () => {
+        updateLinks(parseTable(field.val()));
+    });
+
+    var commitButton = $("<input/>", {
+        type: "submit",
+        value: "Apply changes"
+    });
+
+    var rollbackButton = $("<input/>", {
+        type: "button",
+        value: "Discard changes"
+    });
+    rollbackButton.on("click", () => {
+        location.reload();
+    });
+
+    var aid = $("<input/>", {
+        type: "hidden",
+        name: "aid",
+        value: article._id
+    });
+
+    form.append(field);
+    form.append(commitButton);
+    form.append(rollbackButton);
+    form.append(aid);
+
+    form.insertAfter(aboveLinksRuler);
+
+    removePanels();
+}
+
+function initImageUploader()
+{
+    var formPlace = $("#articleHeadRight");
+
+    var form = $("<form/>", {
+        enctype: "multipart/form-data",
+        method: "post",
+        action: "/article-upload-image",
+        class: "EditorForm"
+    });
+
+    var field = $("<input/>", {
+        name: "image",
+        type: "file",
+        accept: "image/*,image/jpeg",
+        required: "true"
+    });
+
+    var commitButton = $("<input/>", {
+        type: "submit",
+        value: "Upload image"
+    });
+
+    var rollbackButton = $("<input/>", {
+        type: "button",
+        value: "Discard changes"
+    });
+    rollbackButton.on("click", () => {
+        location.reload();
+    });
+
+    var aid = $("<input/>", {
+        type: "hidden",
+        name: "aid",
+        value: article._id
+    });
+
+    form.append(field);
+    form.append(commitButton);
+    form.append(rollbackButton);
+    form.append(aid);
+
+    formPlace.append(form);
+
+    removePanels();
+}
+
 
 function unparseTable(data)
 {
@@ -313,6 +409,31 @@ function updateTable(data)
         tr.append(key);
         tr.append(value);
     });
+}
+
+function updateLinks(data)
+{
+    var linkPanel = $("#leftNavPanel");
+    
+    $(".UserLink").remove();
+
+    data.forEach((link) => {
+        var a = $("<a/>", {
+            class: "LeftPanelNavLink UserLink",
+            href: link.v
+        });
+
+        a.text(link.k);
+
+        linkPanel.append(a);
+    });
+}
+
+function unparseLinks(data)
+{
+    return data.reduce(function(previousValue, currentValue) {
+        return previousValue + currentValue.label + "\n" + currentValue.url + "\n\n";
+    }, "");
 }
 
 

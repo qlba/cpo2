@@ -11,7 +11,7 @@ function processArticleRequest(res, login, req_article, req_version)
     } else if(req_article) {
         responseWithArticle(res, login, req_article);
     } else {
-        throw new Error("Bad request");
+        responseWithError(res, login, new Error("Bad request"));
     }
 }
 
@@ -22,7 +22,14 @@ function responseWithArticle(res, login, req_article)
     db.collection('articles').find(query).toArray((err, articles) => {
         switch (articles.length) {
             case 0:
-                throw new Error("No such article");
+                var message =
+                    (req_article[0] === '#') ?
+                        "No match" :
+                        "No such article, follow <a href=\"/article-create?article=" +
+                        req_article + "\">this link</a> to try to create it.";
+
+                responseWithError(res, login, new Error(message));
+                break;
             case 1:
                 responseWithArticleVersion(res, login, articles[0].main_version);
                 break;
@@ -44,11 +51,11 @@ function responseWithArticleVersion(res, login, req_version)
     db.collection("article_versions").findOne({_id: ObjectID(req_version)}, (err, version) =>
     {
         if(err) {
-            throw err;
+            return responseWithError(res, login, err);
         }
 
         if(!version) {
-            throw new Error("Article version not found");
+            return responseWithError(res, login, new Error("Article version not found"));
         }
 
         res.render('article/body', {
