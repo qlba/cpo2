@@ -34,7 +34,7 @@ block content
                     script
                         | $('#logoutButton').on('click', function(){
                         |   $.post('/logout')
-                        |     .done(function(){location = location;});
+                        |     .done(function(){location.reload();});
                         | });
 
             | |

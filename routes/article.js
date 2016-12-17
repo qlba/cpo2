@@ -107,7 +107,8 @@ router.get("/article-versions", (req, res) =>
 
                 res.render("article/versions", {
                     title: versions[0].name,
-                    versions: versions
+                    versions: versions,
+                    login: req.user
                 });
             })
             .catch((err) => {

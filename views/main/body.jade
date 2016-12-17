@@ -9,4 +9,15 @@ block head_data
 
 block body
     h1 Welcome to WikiEngine
-
+    ul
+        li Type the article you want to find in the top right corner of the page
+        li Search articles using regular expressions (start query with '#')
+        li
+            a(href="/article-random") Go to random article
+        li
+            | Visit one of the recently updated articles
+            ol
+                each rec in recent
+                    li
+                        a(href="/article?version=" + rec.versionId.toString('hex'))
+                            = rec.name + " (" + rec.lastUpdated.toLocaleString() + ")"

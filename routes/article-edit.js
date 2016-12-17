@@ -2,8 +2,7 @@
 var router = require("express").Router(),
     db = require("../modules/db.js"),
     ObjectID = require("mongodb").ObjectID,
-    responseWithError = require("./article").responseWithError,
-    sha = require('../modules/hash');
+    responseWithError = require("./article").responseWithError;
 
 
 function canEdit(login, owner)
