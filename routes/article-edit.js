@@ -2,7 +2,8 @@
 var router = require("express").Router(),
     db = require("../modules/db.js"),
     ObjectID = require("mongodb").ObjectID,
-    responseWithError = require("./article").responseWithError;
+    responseWithError = require("./article").responseWithError,
+    StatusedError = require("./article").StatusedError;
 
 
 function canEdit(login, owner)
@@ -16,11 +17,11 @@ function findAndCheckPermissions(login, id)
         .then((version) =>
         {
             if (!version) {
-                throw new Error("Version not found");
+                throw new StatusedError("Version not found", 404);
             }
 
             if (!canEdit(login, version.owner)) {
-                throw new Error("Operation not permitted");
+                throw new StatusedError("Operation not permitted", 401);
             }
 
             return version;
@@ -41,7 +42,7 @@ function alterVersionAndRespond(req, res, callback)
             res.redirect("back");
         })
         .catch((err) => {
-            responseWithError(res, req.user, err);
+            responseWithError(res, req.user, err, 500);
         });
 }
 
@@ -143,14 +144,14 @@ router.post("/article-upload-image", (req, res) =>
 router.post("/article-clone", (req, res) =>
 {
     if(!req.user) {
-        return responseWithError(res, req.user, new Error("Not logged in to edit"));
+        return responseWithError(res, req.user, new StatusedError("Not logged in to edit", 401));
     }
 
     db.collection("article_versions").findOne({_id: ObjectID(req.body.aid.toString())})
         .then((version) =>
         {
             if(!version) {
-                throw new Error("Error while cloning");
+                throw new StatusedError("Error while cloning", 500);
             }
 
             delete version._id;
@@ -169,7 +170,7 @@ router.post("/article-clone", (req, res) =>
             res.redirect("/article?version=" + newVersion.insertedIds[1].id.toString('hex') + "&forEdit=1");
         })
         .catch((err) => {
-            responseWithError(res, req.user, err);
+            responseWithError(res, req.user, err, 500);
         });
 });
 
@@ -177,15 +178,20 @@ router.post("/article-clone", (req, res) =>
 router.get("/article-create", (req, res) =>
 {
     if(!req.user) {
-        return responseWithError(res, req.user, new Error(
-            "You must be logged in to create articles"));
+        return responseWithError(res, req.user, new StatusedError(
+            "You must be logged in to create articles", 401));
+    }
+
+    if(!req.query.article) {
+        return responseWithError(res, req.user, new StatusedError(
+            "Article name not specified", 400));
     }
 
     db.collection("articles").findOne({name: req.query.article})
         .then((article) =>
         {
-            if (article) {
-                throw new Error("Article already exists");
+            if (article !== null) {
+                throw new StatusedError("Article already exists", 409);
             }
 
 
@@ -228,7 +234,7 @@ router.get("/article-create", (req, res) =>
             res.redirect("/article?article=" + req.query.article + "&forEdit=1");
         })
         .catch((err) => {
-            responseWithError(res, req.user, err);
+            responseWithError(res, req.user, err, 500);
         });
 });
 

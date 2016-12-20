@@ -28,35 +28,24 @@ function validatePassword(actual, expected)
     // return sha.SHA256(rsaKeyPair.decrypt(actual)) === expected;
 }
 
-function signUp(username, password, done)
+function signUp(username, password)
 {
-    db.collection('users').findOne({ username: username }, (err, user) =>
-    {
-        if(err) {
-            console.log(err);
-            return done('Internal error');
-        }
-
-        if (user) {
-            return done('Username already taken');
-        }
-
-        db.collection('users').insertOne({
-            username: username,
-            password: sha.SHA256(rsaKeyPair.decrypt(password)).toString(),
-            status: "u",
-            permissions: [],
-            quota_left: [],
-            bans: []
-        }, (err) => {
-            if(err) {
-                console.log(err);
-                return done('Internal error');
+    return db.collection('users').findOne({ username: username })
+        .then((user) =>
+        {
+            if (user) {
+                throw new Error('Username already taken');
             }
 
-            return done(null);
+            return db.collection('users').insertOne({
+                username: username,
+                password: sha.SHA256(rsaKeyPair.decrypt(password)).toString(),
+                status: 0,
+                permissions: [],
+                quota_left: [],
+                bans: []
+            });
         });
-    });
 }
 
 

@@ -21,10 +21,8 @@ router.get('/', (req, res) => {
             res.render('main/body', {recent: recent, login: req.user});
         })
         .catch((error) => {
-            responseWithError(res, req.user, error);
+            responseWithError(res, req.user, error, 500);
         });
-    
-
 });
 
 

@@ -43,14 +43,16 @@ router.post('/logout', (req, res) => {
 
 router.post('/signup', (req, res) => {
 
-    passport.signup(req.body['username'], req.body['password'], (err) => {
-        if (err) {
+    passport.signup(req.body['username'], req.body['password'])
+        .then(() => 
+        {
+            res.send('Signed up');
+        })
+        .catch((err) => 
+        {
             res.status(500);
-            return res.send(err);
-        }
-
-        return res.send('Signed up');
-    });
+            res.send(err.message);
+        });
 });
 
 

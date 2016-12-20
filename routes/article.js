@@ -4,6 +4,15 @@ var router = require("express").Router(),
     ObjectID = db.ObjectID;
 
 
+function StatusedError(message, status)
+{
+    var err = new Error(message);
+    err.status = status;
+
+    return err;
+}
+
+
 function processArticleRequest(res, login, req_article, req_version)
 {
     if(req_version) {
@@ -11,7 +20,7 @@ function processArticleRequest(res, login, req_article, req_version)
     } else if(req_article) {
         responseWithArticle(res, login, req_article);
     } else {
-        responseWithError(res, login, new Error("Bad request"));
+        responseWithError(res, login, new Error("Bad request"), 400);
     }
 }
 
@@ -28,7 +37,7 @@ function responseWithArticle(res, login, req_article)
                         "No such article, follow <a href=\"/article-create?article=" +
                         req_article + "\">this link</a> to try to create it.";
 
-                responseWithError(res, login, new Error(message));
+                responseWithError(res, login, new Error(message), 404);
                 break;
             case 1:
                 responseWithArticleVersion(res, login, articles[0].main_version);
@@ -51,11 +60,11 @@ function responseWithArticleVersion(res, login, req_version)
     db.collection("article_versions").findOne({_id: ObjectID(req_version)}, (err, version) =>
     {
         if(err) {
-            return responseWithError(res, login, err);
+            return responseWithError(res, login, err, 500);
         }
 
         if(!version) {
-            return responseWithError(res, login, new Error("Article version not found"));
+            return responseWithError(res, login, new Error("Article version not found"), 404);
         }
 
         res.render('article/body', {
@@ -69,8 +78,14 @@ function responseWithArticleVersion(res, login, req_version)
     });
 }
 
-function responseWithError(res, login, error)
+function responseWithError(res, login, error, code)
 {
+    if(error.status !== undefined) {
+        res.status(error.status);
+    } else if(code !== undefined) {
+        res.status(code);
+    }
+
     res.render("article/body",
         {
             error: error.message,
@@ -92,7 +107,7 @@ router.get("/article", (req, res) =>
         try {
             processArticleRequest(res, req.user, requestedArticle, requestedVersion);
         } catch(err) {
-            responseWithError(res, req.user, err);
+            responseWithError(res, req.user, err, 500);
         }
     }
 );
@@ -102,7 +117,7 @@ router.get("/article-versions", (req, res) =>
         db.collection("article_versions").find({articleid: ObjectID(req.query.article.toString())}).toArray()
             .then((versions) => {
                 if(versions.length === 0) {
-                    throw new Error("No versions of this page");
+                    throw StatusedError("No versions of this page", 404);
                 }
 
                 res.render("article/versions", {
@@ -112,7 +127,7 @@ router.get("/article-versions", (req, res) =>
                 });
             })
             .catch((err) => {
-                responseWithError(res, req.user, err);
+                responseWithError(res, req.user, err, 500);
             });
     }
 );
@@ -122,7 +137,7 @@ router.get("/article-random", (req, res) =>
         db.collection('articles').aggregate([{$sample: {size: 1}}]).toArray((err, articles) =>
         {
             if(err || !articles) {
-                responseWithError(res, req.user, new Error("Error occurred"));
+                responseWithError(res, req.user, new Error("Error occurred"), 500);
             }
 
             res.redirect("/article?article=" + articles[0].name);
@@ -133,3 +148,4 @@ router.get("/article-random", (req, res) =>
 
 module.exports = router;
 module.exports.responseWithError = responseWithError;
+module.exports.StatusedError = StatusedError;
