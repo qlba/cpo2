@@ -1,8 +1,11 @@
+
 /* Global override of fonts */
 body {
     box-sizing: border-box;
+
     /*border: 1px solid black;*/
     font-family: "Arial", sans-serif;
+
     /*margin: 0px;*/
 }
 
@@ -26,6 +29,7 @@ blockquote {
 
 
 .Container {
+
     /*margin: 8px;*/
     /*border: 1px solid #6188bb;*/
     /*border-radius: 10px;*/
@@ -33,6 +37,7 @@ blockquote {
 }
 
 .ArticleBodyBlock {
+
     /*border: 1px solid #ff0000;*/
     /*border-radius: 5px;*/
     padding-top: 20px;
@@ -77,6 +82,7 @@ blockquote {
 
     border-left: solid black 1px;
     border-bottom: solid black 1px;
+
     /*border-top: hidden;*/
     border-radius: 10px;
 }
@@ -90,6 +96,7 @@ blockquote {
 
 #articleHeadLeft {
     float: left;
+
     /*max-width: 70%;*/
     margin-bottom: 30px;
 

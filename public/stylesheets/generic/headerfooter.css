@@ -1,7 +1,9 @@
 body {
     box-sizing: border-box;
+
     /*border: 1px solid black;*/
     font-family: "Arial", sans-serif;
+
     /*margin: 0px;*/
 }
 
@@ -17,6 +19,7 @@ body {
     justify-content: space-between;
 
     border-bottom: solid black 1px;
+
     /*border-top: hidden;*/
     border-radius: 10px;
 }
