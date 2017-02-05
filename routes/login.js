@@ -43,7 +43,7 @@ router.post('/logout', (req, res) => {
 
 router.post('/signup', (req, res) => {
 
-    passport.signup(req.body['username'], req.body['password'])
+    passport.signup(req.body.username, req.body.password)
         .then(() => 
         {
             res.send('Signed up');
